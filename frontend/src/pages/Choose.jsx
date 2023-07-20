@@ -32,7 +32,7 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <Container className="bg-main-body py-5">
+    <Container className="bg-main-body bg-main py-5">
       <div className="common-heading  text-center text-light common-title ">
         <h2 className="common-heading text-light">Why Choose Us</h2>
         <hr className="w-25 mx-auto" />

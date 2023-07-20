@@ -113,7 +113,7 @@ const BookedSession = ({ onLogout }) => {
   return (
     <div className="d-flex">
       <Sidebar onLogout={handleLogout} />
-      <main className="flex-grow-1 bg-main-body overflow-auto">
+      <main className="flex-grow-1 bg-main-body overflow-auto px-5">
         <div className="mt-4 mx-5">
           <div className="common-heading text-center text-light common-title ">
             <h2 className="common-heading text-light">Book Schedule</h2>

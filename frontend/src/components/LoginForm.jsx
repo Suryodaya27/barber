@@ -80,6 +80,7 @@ const LoginForm = ({ onLogin }) => {
   };
 
   return (
+    <div className=" bg-main-body bg-main">
     <div className="container">
       <div className="login">
         <div className="login__content">
@@ -143,6 +144,7 @@ const LoginForm = ({ onLogin }) => {
           </form>
         </div>
       </div>
+    </div>
     </div>
   );
 };

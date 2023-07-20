@@ -26,12 +26,14 @@ const login = require('./routes/login');
 const bookSession = require('./routes/bookSession');
 const bookings = require('./routes/bookings');
 const availability = require('./routes/availability');
+const deleteBooking = require('./routes/deleteBooking')
 
 app.use('/api/signup', signup);
 app.use('/api/login', login);
 app.use('/api/' , bookSession);
 app.use('/api/' , bookings);
 app.use('/api/' , availability);
+app.use('/api/',deleteBooking);
 
 const port = 8080;
 

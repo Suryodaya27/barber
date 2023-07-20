@@ -12,11 +12,11 @@ function Home({ onLogout }) {
   return (
     <div className="d-flex">
       <Sidebar onLogout={handleLogout} />
-      <main className="flex-grow-1 bg-main-body overflow-auto">
+      <main className="flex-grow-1 bg-main-body overflow-auto px-5">
         <section className="bg-main bg-color bg-main-body hero-section">
           <div className="container">
             <div className="row mb-5">
-              <div className="ml-3 d-flex flex-column align-items-start justify-content-center col-xl-6 xol-lg-6 col-md-12 col-12 text-md-start text-center">
+              <div className="d-flex flex-column align-items-start justify-content-center col-xl-6 xol-lg-6 col-md-12 col-12 text-md-start text-center">
                 <h1 className="text-capitalize fw-bolder text-white">
                 Look Your Best, Feel Your Best
                 </h1>

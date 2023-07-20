@@ -31,19 +31,28 @@ const LightTypography = styled(Typography)({
 const MyBookings = ({ onLogout }) => {
   const [pastBookings, setPastBookings] = useState([]);
   const [upcomingBookings, setUpcomingBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Retrieve the bearer token from localStorage
-    const token = localStorage.getItem('token');
+    const fetchBookings = async () => {
+      try {
+        // Retrieve the bearer token from localStorage
+        const token = localStorage.getItem('token');
 
-    // Fetch user bookings from the API
-    fetch('http://localhost:8080/api/bookings', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
+        // Fetch user bookings from the API
+        const response = await fetch('http://localhost:8080/api/bookings', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch bookings');
+        }
+
+        const data = await response.json();
+
         // Split bookings into past and upcoming based on the date
         const today = moment().startOf('day');
         const past = [];
@@ -61,75 +70,114 @@ const MyBookings = ({ onLogout }) => {
 
         setPastBookings(past);
         setUpcomingBookings(upcoming);
-      })
-      .catch((error) => {
-        console.error('Error fetching bookings:', error);
-      });
+        setLoading(false);
+      } catch (error) {
+        setError('Error fetching bookings. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
   }, []);
 
   const handleLogout = () => {
     onLogout();
   };
 
+  const handleCancelSession = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = `http://localhost:8080/api/cancel/${bookingId}`;
+
+      const response = await fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to cancel session');
+      }
+
+      // Display success message
+      alert('Session has been canceled successfully');
+
+      // Remove the canceled booking from the state
+      const updatedUpcomingBookings = upcomingBookings.filter((booking) => booking.id !== bookingId);
+      setUpcomingBookings(updatedUpcomingBookings);
+    } catch (error) {
+      console.error('Error:', error);
+      // Display error message
+      alert('Failed to cancel session. Please try again.');
+    }
+  };
+
   return (
     <div className="d-flex">
       <Sidebar onLogout={handleLogout} />
-      <main className="flex-grow-1 bg-main-body overflow-auto">
+      <main className="flex-grow-1 bg-main-body overflow-auto pb-5">
         <div className="mt-5 mx-5">
           <div className="common-heading text-center text-light common-title">
             <h2 className="common-heading text-light">My Bookings</h2>
             <hr className="w-25 mx-auto" />
           </div>
 
-          {/* Rest of the component's content */}
-          {/* ... */}
-
-          {upcomingBookings.length > 0 && (
-            <div className="mb-4">
-              <h4 className="text-white common-title">Upcoming Bookings :</h4>
-              <Grid container spacing={2}>
-                {upcomingBookings.map((booking) => (
-                  <Grid item xs={12} sm={6} md={4} key={booking.id}>
-                    <GlassMorphicCard elevation={5}>
-                      <LightTypography variant="h5" gutterBottom>
-                        Date: {moment(booking.session.date).format('DD/MM/YYYY')}
-                      </LightTypography>
-                      <LightTypography variant="body1" gutterBottom>
-                        Time: {booking.session.time}
-                      </LightTypography>
-                      <LightTypography variant="body1">Price: {booking.session.price}</LightTypography>
-                    </GlassMorphicCard>
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p className="text-white common-title">{error}</p>
+          ) : (
+            <>
+              {upcomingBookings.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-white common-title">Upcoming Bookings :</h4>
+                  <Grid container spacing={2}>
+                    {upcomingBookings.map((booking) => (
+                      <Grid item xs={12} sm={6} md={4} key={booking.id}>
+                        <GlassMorphicCard elevation={5}>
+                          <LightTypography variant="h5" gutterBottom>
+                            Date: {moment(booking.session.date).format('DD/MM/YYYY')}
+                          </LightTypography>
+                          <LightTypography variant="body1" gutterBottom>
+                            Time: {booking.session.time}
+                          </LightTypography>
+                          <LightTypography variant="body1">Price: {booking.session.price}</LightTypography>
+                          <button className='btn btn-primary mt-2' onClick={() => handleCancelSession(booking.id)}>Cancel Session</button>
+                        </GlassMorphicCard>
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
-              </Grid>
-            </div>
-          )}
+                </div>
+              )}
 
-          {pastBookings.length > 0 && (
-            <div>
-              <h4 className="text-white common-title mt-5">Past Bookings :</h4>
-              <Grid container spacing={2}>
-                {pastBookings.map((booking) => (
-                  <Grid item xs={12} sm={6} md={4} key={booking.id}>
-                    <GlassMorphicCard elevation={5}>
-                      <LightTypography variant="h5" gutterBottom>
-                        Date: {moment(booking.session.date).format('DD/MM/YYYY')}
-                      </LightTypography>
-                      <LightTypography variant="body1" gutterBottom>
-                        Time: {booking.session.time}
-                      </LightTypography>
-                      <LightTypography variant="body1">Price: {booking.session.price}</LightTypography>
-                    </GlassMorphicCard>
+              {pastBookings.length > 0 && (
+                <div>
+                  <h4 className="text-white common-title mt-5">Past Bookings :</h4>
+                  <Grid container spacing={2}>
+                    {pastBookings.map((booking) => (
+                      <Grid item xs={12} sm={6} md={4} key={booking.id}>
+                        <GlassMorphicCard elevation={5}>
+                          <LightTypography variant="h5" gutterBottom>
+                            Date: {moment(booking.session.date).format('DD/MM/YYYY')}
+                          </LightTypography>
+                          <LightTypography variant="body1" gutterBottom>
+                            Time: {booking.session.time}
+                          </LightTypography>
+                          <LightTypography variant="body1">Price: {booking.session.price}</LightTypography>
+                          {/* <button className='btn btn-primary mt-2' onClick={() => handleCancelSession(booking.id)}>Cancel Session</button> */}
+                        </GlassMorphicCard>
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
-              </Grid>
-            </div>
-          )}
+                </div>
+              )}
 
-          {pastBookings.length === 0 && upcomingBookings.length === 0 && (
-            <p className="text-white common-title">No bookings found.</p>
+              {pastBookings.length === 0 && upcomingBookings.length === 0 && (
+                <p className="text-white common-title">No bookings found.</p>
+              )}
+            </>
           )}
-
         </div>
       </main>
     </div>
