@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id        Int       @id @default(autoincrement())
+  date      DateTime
+  time      String
+  capacity  Int
+  price     Float    // Add a new field for session price
+  bookings  Booking[]
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
+  password     String
+  phoneNumber  String   @unique
+  bookings     Booking[]
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  sessionId   Int
+  customerId  Int
+  // orderId     String   @unique// Add a new field for Razorpay order ID
+  // orderAmount Float    // Add a new field for order amount
+  // status      String   // Add a new field for booking status
+  session     Session  @relation(fields: [sessionId], references: [id])
+  user        User     @relation(fields: [customerId], references: [id])
+}
