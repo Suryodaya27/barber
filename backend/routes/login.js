@@ -24,7 +24,7 @@ router.use(
 
 router.post('/', async (req, res) => {
   // Validate the user's input.
-  if (!req.body.username || !req.body.password) {
+  if (!req.body.email || !req.body.password) {
     res.status(400).send('Please provide a valid username and password.');
     return;
   }
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
   // Check if the user exists in the database.
   const user = await prisma.user.findUnique({
     where: {
-      username: req.body.username,
+      email: req.body.email,
     },
   });
 

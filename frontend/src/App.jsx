@@ -26,7 +26,7 @@ function App() {
           element={token ? <Home onLogout={handleLogout} /> : <LoginForm onLogin={handleLogin} />}
         />
         <Route path="/home" element={token ? <Home onLogout={handleLogout} /> : <LoginForm onLogin={handleLogin} />} />
-        <Route path="/bookschedule" element={token ? <BookSchedule /> : <LoginForm onLogin={handleLogin} />} />
+        <Route path="/bookschedule" element={token ? <BookSchedule onLogout={handleLogout} /> : <LoginForm onLogin={handleLogin} />} />
         <Route path="/mybookings" element={token ? <MyBookings onLogout={handleLogout} /> : <LoginForm onLogin={handleLogin} />} />
       </Routes>
     </Router>

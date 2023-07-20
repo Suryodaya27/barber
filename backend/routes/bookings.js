@@ -7,13 +7,14 @@ const router = express.Router();
 
 // Endpoint to get user bookings
 router.get('/bookings', verifyToken, async (req, res) => {
-    const { customerId } = req; // Get customerId from the authenticated user
+    const { customerId } = req.userId; // Get customerId from the authenticated user
+    console.log(req.userId)
   
     try {
       // Retrieve the bookings for the customer
       const bookings = await prisma.booking.findMany({
         where: {
-          customerId,
+          customerId:req.userId,
         },
         include: {
           session: true, // Include the associated session details

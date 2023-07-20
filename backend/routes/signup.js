@@ -1,6 +1,5 @@
 // routes/generatePassword.js
 const express = require('express');
-const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 
 const { PrismaClient } = require("@prisma/client");
@@ -10,7 +9,7 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   // Validate the user's input.
-  if (!req.body.username || !req.body.email || !req.body.password || !req.body.phoneNumber) {
+  if (!req.body.email || !req.body.password) {
     res.status(400).send("Please provide a valid username and email.");
     return;
   }
@@ -19,17 +18,13 @@ router.post("/", async (req, res) => {
   const existingUser = await prisma.user.findFirst({
     where: {
       OR: [
-        { username: req.body.username },
         { email: req.body.email },
-        { phoneNumber: req.body.phoneNumber },
       ]
     },
   });
 
   if (existingUser) {
-    if (existingUser.username === req.body.username) {
-      res.status(409).send("Username already in use.");
-    } else if (existingUser.email === req.body.email) {
+    if (existingUser.email === req.body.email) {
       res.status(409).send("Email address already in use.");
     }
     return;
@@ -45,10 +40,8 @@ router.post("/", async (req, res) => {
   let newUser;
     newUser = await prisma.user.create({
       data: {
-        username: req.body.username,
         email: req.body.email,
         password: hashedPassword,
-        phoneNumber: req.body.phoneNumber,
       },
     });
 

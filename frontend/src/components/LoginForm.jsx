@@ -1,20 +1,22 @@
 import React, { useState } from "react";
 import bgImage from "../img/bg-login.png";
 import '../styles/login.css'
+
 const LoginForm = ({ onLogin }) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [signupSuccess, setSignupSuccess] = useState(false); // State to track signup success
 
   const handleUsernameChange = (event) => {
-    setUsername(event.target.value);
+    setEmail(event.target.value);
   };
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
 
-  const handleFormSubmit = async (event) => {
+  const handleLoginSubmit = async (event) => {
     event.preventDefault();
 
     try {
@@ -23,7 +25,7 @@ const LoginForm = ({ onLogin }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
@@ -38,12 +40,40 @@ const LoginForm = ({ onLogin }) => {
       onLogin(token);
 
       // Clear the form
-      setUsername("");
+      setEmail("");
       setPassword("");
       setError(null);
 
       // Redirect or perform any necessary actions
       // after successful login
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleSignupSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:8080/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+
+      setSignupSuccess(true); // Set signup success state to true
+
+      // Clear the form
+      setEmail("");
+      setPassword("");
+      setError(null);
     } catch (error) {
       setError(error.message);
     }
@@ -55,15 +85,11 @@ const LoginForm = ({ onLogin }) => {
         <div className="login__content">
           <img className="login__img" src={bgImage} alt="Login image" />
 
-          <form className="login__form" onSubmit={handleFormSubmit}>
+          <form className="login__form">
             <div>
               <h1 className="login__title">
-                <span>Welcome</span> Back
+                <span>Welcome</span> to TrimTrends
               </h1>
-
-              <p className="login__description">
-                Welcome! Please login to continue.
-              </p>
             </div>
 
             <div>
@@ -72,10 +98,10 @@ const LoginForm = ({ onLogin }) => {
                   <label htmlFor="email" className="login__label">Email</label>
                   <input
                     className="login__input"
-                    type="text"
+                    type="email"
                     id="email"
                     placeholder="Enter your email address"
-                    value={username}
+                    value={email}
                     onChange={handleUsernameChange}
                     required
                   />
@@ -102,12 +128,18 @@ const LoginForm = ({ onLogin }) => {
 
             <div>
               <div className="login__buttons">
-                <button className="login__button" type="submit">Log In</button>
-                <button className="login__button login__button-ghost">Sign Up</button>
+                <button className="login__button" type="submit" onClick={handleLoginSubmit}>Log In</button>
+                <button className="login__button login__button-ghost" type="submit" onClick={handleSignupSubmit}>Sign Up</button>
               </div>
 
               <a className="login__forgot" href="#">Forgot Password?</a>
             </div>
+
+            {signupSuccess && (
+              <div className="login__success">
+                Signup successful! Please login to continue.
+              </div>
+            )}
           </form>
         </div>
       </div>
