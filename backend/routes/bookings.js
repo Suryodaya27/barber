@@ -18,6 +18,7 @@ router.get('/bookings', verifyToken, async (req, res) => {
         },
         include: {
           session: true, // Include the associated session details
+          barberShop:true,
         },
       });
   

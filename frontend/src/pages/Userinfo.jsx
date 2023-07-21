@@ -142,7 +142,9 @@ const MyBookings = ({ onLogout }) => {
                           <LightTypography variant="body1" gutterBottom>
                             Time: {booking.session.time}
                           </LightTypography>
-                          <LightTypography variant="body1">Price: {booking.session.price}</LightTypography>
+                          {/* <LightTypography variant="body1">Price: {booking.session.price}</LightTypography> */}
+                          <LightTypography variant="body1" gutterBottom>Name: {booking.barberShop.name}</LightTypography>
+                          <LightTypography variant="body1" gutterBottom>Address: {booking.barberShop.address} , {booking.barberShop.city} , {booking.barberShop.zipCode}</LightTypography>
                           <button className='btn btn-primary mt-2' onClick={() => handleCancelSession(booking.id)}>Cancel Session</button>
                         </GlassMorphicCard>
                       </Grid>
@@ -164,7 +166,9 @@ const MyBookings = ({ onLogout }) => {
                           <LightTypography variant="body1" gutterBottom>
                             Time: {booking.session.time}
                           </LightTypography>
-                          <LightTypography variant="body1">Price: {booking.session.price}</LightTypography>
+                          {/* <LightTypography variant="body1">Price: {booking.session.price}</LightTypography> */}
+                          <LightTypography variant="body1" gutterBottom>Name: {booking.barberShop.name}</LightTypography>
+                          <LightTypography variant="body1" gutterBottom>Address: {booking.barberShop.address} , {booking.barberShop.city} , {booking.barberShop.zipCode}</LightTypography>
                           {/* <button className='btn btn-primary mt-2' onClick={() => handleCancelSession(booking.id)}>Cancel Session</button> */}
                         </GlassMorphicCard>
                       </Grid>

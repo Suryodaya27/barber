@@ -31,31 +31,57 @@ const LightTypography = styled(Typography)({
 });
 
 const BookedSession = ({ onLogout }) => {
+  const [barberShopsData, setBarberShopsData] = useState([]);
   const [apiResponse, setApiResponse] = useState([]);
+  const [selectedBarberShopId, setSelectedBarberShopId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD'));
   const [selectedSessionId, setSelectedSessionId] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
 
-  const handleDateSelect = (selectedDate) => {
-    // Make the API call with the selected date
-    const apiUrl = `http://localhost:8080/api/availability?date=${selectedDate}`;
-
-    // Fetch the API response
-    fetch(apiUrl)
+  const fetchBarberShops = () => {
+    return fetch('http://localhost:8080/api/getBarbers')
       .then((response) => response.json())
-      .then((data) => {
-        // Update the API response state
-        setApiResponse(data);
-      })
       .catch((error) => {
-        console.error('Error:', error);
+        console.error('Error fetching barber shops:', error);
+      });
+  };
+
+  const fetchAvailableSessions = (barberShopId, selectedDate) => {
+    const apiUrl = `http://localhost:8080/api/${barberShopId}/availability?date=${selectedDate}`;
+    return fetch(apiUrl)
+      .then((response) => response.json())
+      .catch((error) => {
+        console.error('Error fetching available sessions:', error);
       });
   };
 
   useEffect(() => {
-    // Initial API call with today's date
-    const todayDate = moment().format('YYYY-MM-DD');
-    handleDateSelect(todayDate);
+    // Fetch the list of barber shops
+    fetchBarberShops().then((data) => {
+      setBarberShopsData(data);
+    });
   }, []);
+
+  const handleBarberShopSelect = (barberShopId) => {
+    setSelectedBarberShopId(barberShopId);
+    setShowAlert(false); // Hide the alert if visible
+
+    // Fetch available sessions for the selected date and barber shop
+    fetchAvailableSessions(barberShopId, selectedDate).then((data) => {
+      setApiResponse(data);
+    });
+  };
+
+  const handleDateSelect = (selectedDate) => {
+    setSelectedDate(selectedDate);
+
+    if (selectedBarberShopId !== null) {
+      // Fetch available sessions for the selected date and barber shop
+      fetchAvailableSessions(selectedBarberShopId, selectedDate).then((data) => {
+        setApiResponse(data);
+      });
+    }
+  };
 
   const handleSessionBooking = (sessionId) => {
     setSelectedSessionId(sessionId);
@@ -70,6 +96,7 @@ const BookedSession = ({ onLogout }) => {
     const apiUrl = 'http://localhost:8080/api/book-session';
     const requestData = {
       sessionId: selectedSessionId,
+      barbershopId: selectedBarberShopId,
     };
 
     fetch(apiUrl, {
@@ -85,6 +112,11 @@ const BookedSession = ({ onLogout }) => {
         if (response.ok) {
           // Display success message
           alert('Session booked successfully');
+
+          // After successful booking, fetch available sessions again
+          fetchAvailableSessions(selectedBarberShopId, selectedDate).then((data) => {
+            setApiResponse(data);
+          });
         } else {
           throw new Error('Failed to book session');
         }
@@ -119,27 +151,52 @@ const BookedSession = ({ onLogout }) => {
             <h2 className="common-heading text-light">Book Schedule</h2>
             <hr className="w-25 mx-auto" />
           </div>
-          <Calendar onDateSelect={handleDateSelect} />
-        </div>
-        <div className="container">
-          <Grid container spacing={2}>
-            {apiResponse.map((item) => (
-              <Grid item xs={12} sm={6} md={4} key={item.id}>
-                <GlassMorphicCard elevation={5} onClick={() => handleSessionBooking(item.id)}>
-                  <LightTypography variant="h5" gutterBottom>
-                    Date: {moment(item.date).format('DD/MM/YYYY')}
-                  </LightTypography>
-                  <LightTypography variant="body1" gutterBottom>
-                    Time: {item.time}
-                  </LightTypography>
-                  <LightTypography variant="body1" gutterBottom>
-                    Capacity: {item.capacity}
-                  </LightTypography>
-                  <LightTypography variant="body1">Price: {item.price}</LightTypography>
-                </GlassMorphicCard>
+
+          {/* Render the list of barber shops if no barber shop is selected */}
+          {selectedBarberShopId === null ? (
+            <div className="">
+              <Grid container spacing={2}>
+                {barberShopsData.map((barberShop) => (
+                  <Grid item xs={12} sm={6} md={4} key={barberShop.id}>
+                    <GlassMorphicCard elevation={5} onClick={() => handleBarberShopSelect(barberShop.id)}>
+                      <LightTypography variant="h5" gutterBottom>
+                        {barberShop.name}
+                      </LightTypography>
+                      <LightTypography variant="body1" gutterBottom>
+                        Address: {barberShop.address}
+                      </LightTypography>
+                      {/* Add more information about the barber shop here */}
+                    </GlassMorphicCard>
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
+            </div>
+          ) : (
+            // Render the calendar and available sessions if a barber shop is selected
+            <div>
+              <Calendar onDateSelect={handleDateSelect} />
+              <div className="container">
+                <Grid container spacing={2}>
+                  {apiResponse.map((item) => (
+                    <Grid item xs={12} sm={6} md={4} key={item.id}>
+                      <GlassMorphicCard elevation={5} onClick={() => handleSessionBooking(item.id)}>
+                        <LightTypography variant="h5" gutterBottom>
+                          Date: {moment(item.date).format('DD/MM/YYYY')}
+                        </LightTypography>
+                        <LightTypography variant="body1" gutterBottom>
+                          Time: {item.time}
+                        </LightTypography>
+                        <LightTypography variant="body1" gutterBottom>
+                          Capacity: {item.capacity}
+                        </LightTypography>
+                        <LightTypography variant="body1">Price: {item.price}</LightTypography>
+                      </GlassMorphicCard>
+                    </Grid>
+                  ))}
+                </Grid>
+              </div>
+            </div>
+          )}
         </div>
       </main>
       {/* "Are you sure?" alert */}

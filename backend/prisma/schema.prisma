@@ -7,13 +7,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model BarberShop {
+  id         Int         @id @default(autoincrement())
+  name       String
+  address    String
+  city       String
+  state      String
+  zipCode    String
+  phone      String
+  email      String
+  sessions   Session[]
+  bookings   Booking[]
+  barberShopView  BarbershopView[]
+}
+
 model Session {
-  id        Int       @id @default(autoincrement())
-  date      DateTime
-  time      String
-  capacity  Int
-  price     Float    // Add a new field for session price
-  bookings  Booking[]
+  id           Int        @id @default(autoincrement())
+  date         DateTime
+  time         String
+  capacity     Int
+  price        Float
+  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
+  barberShopId Int
+  bookings     Booking[]
 }
 
 model User {
@@ -24,12 +40,19 @@ model User {
 }
 
 model Booking {
-  id          Int      @id @default(autoincrement())
-  sessionId   Int
-  customerId  Int
-  // orderId     String   @unique// Add a new field for Razorpay order ID
-  // orderAmount Float    // Add a new field for order amount
-  // status      String   // Add a new field for booking status
-  session     Session  @relation(fields: [sessionId], references: [id])
-  user        User     @relation(fields: [customerId], references: [id])
+  id           Int        @id @default(autoincrement())
+  sessionId    Int
+  customerId   Int
+  barberShopId Int
+  session      Session    @relation(fields: [sessionId], references: [id])
+  barberShop   BarberShop @relation(fields: [barberShopId], references: [id])
+  user         User       @relation(fields: [customerId], references: [id])
+}
+
+model BarbershopView {
+  // id             Int       @id @default(autoincrement())
+  barbershopId   Int        @id
+  barbershopImage String
+  menuImage      String
+  barbershop     BarberShop @relation(fields: [barbershopId], references: [id])
 }

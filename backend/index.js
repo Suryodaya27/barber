@@ -26,7 +26,9 @@ const login = require('./routes/login');
 const bookSession = require('./routes/bookSession');
 const bookings = require('./routes/bookings');
 const availability = require('./routes/availability');
-const deleteBooking = require('./routes/deleteBooking')
+const deleteBooking = require('./routes/deleteBooking');
+const getBarbers = require('./routes/getBarbers');
+const getView = require('./routes/getView')
 
 app.use('/api/signup', signup);
 app.use('/api/login', login);
@@ -34,6 +36,8 @@ app.use('/api/' , bookSession);
 app.use('/api/' , bookings);
 app.use('/api/' , availability);
 app.use('/api/',deleteBooking);
+app.use('/api/', getBarbers);
+app.use('/api/',getView)
 
 const port = 8080;
 

@@ -4,15 +4,16 @@ const prisma = new PrismaClient();
 
 const router = express.Router();
 
-// Endpoint to check session availability for a particular date
-router.get('/availability', async (req, res) => {
+// Endpoint to check session availability for a particular date and barber shop
+router.get('/:barbershopId/availability', async (req, res) => {
   const { date } = req.query;
+  const { barbershopId } = req.params;
 
   try {
-    // Retrieve sessions for the specified date using raw SQL query
+    // Retrieve sessions for the specified date and barber shop using raw SQL query
     const sessions = await prisma.$queryRaw`
       SELECT * FROM session
-      WHERE DATE(date) = ${date}
+      WHERE DATE(date) = ${date} AND barberShopId = ${barbershopId}
     `;
 
     res.status(200).json(sessions);

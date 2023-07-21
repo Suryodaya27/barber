@@ -2,13 +2,14 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const verifyToken = require('../middlewares/authMiddleware');
+const session = require('express-session');
 const router = express.Router();
 
 // Endpoint to book a session
 router.post('/book-session',verifyToken , async (req, res) => {
   const { sessionId} = req.body;
   const  customerId  = req.userId;
-
+  console.log(customerId)
   try {
     // Check if the session exists and has available capacity
     const session = await prisma.session.findFirst({
@@ -23,12 +24,13 @@ router.post('/book-session',verifyToken , async (req, res) => {
     if (!session) {
       return res.status(404).send('Session not found or fully booked.');
     }
-
+    const barberShopId=session.barberShopId
     // Create a new booking
     const booking = await prisma.booking.create({
       data: {
         sessionId,
         customerId,
+        barberShopId,
       },
     });
 

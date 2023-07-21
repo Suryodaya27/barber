@@ -5,6 +5,7 @@ import BookSchedule from './pages/BookSchedule';
 import MyBookings from './pages/Userinfo';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
