@@ -1,4 +1,8 @@
 # barber
+
+#demo video:
+https://youtu.be/MQEKdOPNHwI
+
 #login
 ![image](https://github.com/Suryodaya27/barber/assets/79349719/a10380e9-a25c-4fe6-9525-9cfd69072dcf)
 
